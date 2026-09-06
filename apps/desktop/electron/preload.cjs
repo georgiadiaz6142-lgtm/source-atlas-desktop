@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('desktop', {
   readKnowledge: (assetIds) => invoke('read-knowledge', assetIds),
   loadWorkspace: () => invoke('load-workspace'),
   saveWorkspace: (workspace) => invoke('save-workspace', workspace),
+  exportCanvasDocument: (input) => invoke('export-canvas-document', input),
   openAsset: (filePath) => invoke('open-asset', filePath),
   revealAsset: (filePath) => invoke('reveal-asset', filePath),
   renameAsset: (assetId, name) => invoke('rename-asset', assetId, name),

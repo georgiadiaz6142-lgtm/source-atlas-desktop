@@ -130,7 +130,7 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
   addAssetNodes: (roots, position = { x: 180, y: 180 }) => set((state) => {
     const additions = roots.filter((asset) => !state.nodes.some((node) => node.data.assetId === asset.id)).map((asset, index) => ({
       id: crypto.randomUUID(), type: 'knowledgeNode', position: { x: position.x + (index % 4) * 160, y: position.y + Math.floor(index / 4) * 145 },
-      style: { width: 112, height: 112 }, data: { kind: asset.kind, title: asset.name, subtitle: asset.kind === 'folder' ? '本地文件夹' : asset.extension.slice(1).toUpperCase(), assetId: asset.id, status: asset.indexStatus },
+      style: { width: 112, height: 112 }, data: { kind: asset.kind, title: asset.name, subtitle: asset.kind === 'folder' ? '本地原文件夹' : '本地原文件', assetId: asset.id, status: asset.indexStatus },
     } as CanvasNode));
     return { nodes: [...state.nodes, ...additions], undoStack: additions.length ? pushUndo(state) : state.undoStack, revision: state.revision + (additions.length ? 1 : 0) };
   }),

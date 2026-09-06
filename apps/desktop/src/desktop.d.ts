@@ -14,6 +14,7 @@ declare global {
       readKnowledge(assetIds: string[]): Promise<Citation[]>;
       loadWorkspace(): Promise<WorkspaceState | null>;
       saveWorkspace(workspace: WorkspaceState): Promise<{ saved: boolean; revision: number; updatedAt?: number }>;
+      exportCanvasDocument(input: { type: 'txt' | 'word'; title: string; content: string }): Promise<{ canceled: boolean; path?: string }>;
       openAsset(path: string): Promise<string>;
       revealAsset(path: string): Promise<void>;
       renameAsset(assetId: string, name: string): Promise<{ previousPath: string; assets: Asset[] }>;

@@ -1,4 +1,4 @@
-# 哇塞·超级桌面
+# 知源星图 · SourceAtlas
 
 一个本地优先的 AI 无限画布桌面应用，用于组织文件、知识库、关系连线和 AI 分析结果。
 
@@ -39,6 +39,14 @@ npm test
 npm run build
 ```
 
+打包当前 Mac 可直接双击运行的应用：
+
+```bash
+npm run package:mac
+```
+
+产物位于 `apps/desktop/release/知源星图-darwin-<架构>/知源星图.app`。
+
 ## 运行交互原型
 
 ```bash
@@ -58,4 +66,4 @@ npm run dev
 - [GitHub 上传与仓库指南](docs/GITHUB-UPLOAD.md)
 - [源码整理与验证报告](docs/SOURCE-AUDIT.md)
 - [无限画布 + 项目管理 PRD](docs/无限画布+项目管理-PRD.md)
-- [AI 本地优先技术栈手册](docs/哇塞-超级桌面-AI本地优先桌面产品Vibe-Coding通用技术栈手册.md)
+- [AI 本地优先技术栈手册](docs/知源星图-AI本地优先桌面产品Vibe-Coding通用技术栈手册.md)

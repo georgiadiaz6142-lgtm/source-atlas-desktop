@@ -4,12 +4,16 @@ node_modules/
 # Builds and caches
 dist/
 out/
+release/
 .next/
 .vinext/
 .vite/
 .wrangler/
 coverage/
 *.tsbuildinfo
+apps/desktop/vite.config.js
+apps/desktop/build/source-atlas.iconset/
+apps/desktop/build/source-atlas-icon-draft*.png
 
 # Local application data
 *.db
@@ -30,4 +34,3 @@ coverage/
 # Editor files
 .idea/
 .vscode/
-

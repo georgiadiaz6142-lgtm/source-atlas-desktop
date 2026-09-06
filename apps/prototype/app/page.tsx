@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <main className="app-shell">
       <aside className="rail" aria-label="主导航">
-        <div className="brand-mark" aria-label="哇塞-超级桌面"><Sparkles size={18} strokeWidth={2.2} /></div>
+        <div className="brand-mark" aria-label="知源星图"><Sparkles size={18} strokeWidth={2.2} /></div>
         <nav className="rail-nav">
           <button onClick={() => setPanel(null)} className={`rail-button ${panel === null ? 'active' : ''}`} aria-label="画布"><LayoutDashboard size={19} /></button>
           <button onClick={() => setPanel(panel === 'assets' ? null : 'assets')} className={`rail-button ${panel === 'assets' ? 'active' : ''}`} aria-label="资料"><Folder size={19} /></button>
@@ -61,7 +61,7 @@ export default function Home() {
           <div className="project-identity">
             <div className="project-icon"><BrainCircuit size={17} /></div>
             <div>
-              <div className="project-title-row"><h1>哇塞-超级桌面</h1><span>/</span><strong>新产品调研</strong><ChevronDown size={14} /></div>
+              <div className="project-title-row"><h1>知源星图</h1><span>/</span><strong>新产品调研</strong><ChevronDown size={14} /></div>
               <p>最后保存于 1 分钟前</p>
             </div>
           </div>
@@ -183,7 +183,7 @@ function AIChat({ onClose }: { onClose: () => void }) {
 }
 
 function AnswerDialog({ question, onClose, onSave }: { question: string; onClose: () => void; onSave: () => void }) {
-  return <div className="modal-backdrop"><section className="answer-dialog"><div className="dialog-head"><div><span className="dialog-icon"><Sparkles size={17} /></span><div><strong>基于 20 份资料的回答</strong><small>已检索 8 条关键证据</small></div></div><button onClick={onClose}><X size={17} /></button></div><div className="question-echo">{question}</div><article className="answer-content"><h2>核心发现</h2><p>多份访谈共同表明，用户真正缺少的不是另一个文件管理器，而是把分散资料转化为<strong>可验证结论</strong>的工作方式。受访者最常遇到的阻碍是：资料之间的关系不可见，以及 AI 回答无法快速回到原文。</p><p>竞品普遍解决了“收集”和“搜索”，但较少把<strong>证据、结论与下一步任务</strong>放在同一个连续工作流中。这构成了哇塞-超级桌面最清晰的差异化机会。</p><div className="inline-citations"><button>[1] 用户访谈汇总 · 第 4 页 <ExternalLink size={11} /></button><button>[2] 竞品分析报告 ·「知识工作流」 <ExternalLink size={11} /></button><button>[3] 研究笔记 ·「可信度」 <ExternalLink size={11} /></button></div><h3>建议优先验证</h3><ol><li>用户能否在 10 秒内从结论回到支撑它的原文；</li><li>把结论直接转为任务，是否能减少信息在工具之间丢失；</li><li>画布关系能否帮助用户理解 AI 实际读取了哪些资料。</li></ol></article><footer className="dialog-footer"><span><ShieldCheck size={13} />仅发送了 8 条证据块，完整文件留在本机</span><div><button className="copy-button"><Copy size={14} />复制</button><button onClick={onSave} className="primary-action"><MessageSquareText size={14} />保存为结论节点</button></div></footer></section></div>;
+  return <div className="modal-backdrop"><section className="answer-dialog"><div className="dialog-head"><div><span className="dialog-icon"><Sparkles size={17} /></span><div><strong>基于 20 份资料的回答</strong><small>已检索 8 条关键证据</small></div></div><button onClick={onClose}><X size={17} /></button></div><div className="question-echo">{question}</div><article className="answer-content"><h2>核心发现</h2><p>多份访谈共同表明，用户真正缺少的不是另一个文件管理器，而是把分散资料转化为<strong>可验证结论</strong>的工作方式。受访者最常遇到的阻碍是：资料之间的关系不可见，以及 AI 回答无法快速回到原文。</p><p>竞品普遍解决了“收集”和“搜索”，但较少把<strong>证据、结论与下一步任务</strong>放在同一个连续工作流中。这构成了知源星图最清晰的差异化机会。</p><div className="inline-citations"><button>[1] 用户访谈汇总 · 第 4 页 <ExternalLink size={11} /></button><button>[2] 竞品分析报告 ·「知识工作流」 <ExternalLink size={11} /></button><button>[3] 研究笔记 ·「可信度」 <ExternalLink size={11} /></button></div><h3>建议优先验证</h3><ol><li>用户能否在 10 秒内从结论回到支撑它的原文；</li><li>把结论直接转为任务，是否能减少信息在工具之间丢失；</li><li>画布关系能否帮助用户理解 AI 实际读取了哪些资料。</li></ol></article><footer className="dialog-footer"><span><ShieldCheck size={13} />仅发送了 8 条证据块，完整文件留在本机</span><div><button className="copy-button"><Copy size={14} />复制</button><button onClick={onSave} className="primary-action"><MessageSquareText size={14} />保存为结论节点</button></div></footer></section></div>;
 }
 
 function FolderCanvas({ onClose, onNotify }: { onClose: () => void; onNotify: (message: string) => void }) {

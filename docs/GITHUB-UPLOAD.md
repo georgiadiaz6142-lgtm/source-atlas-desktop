@@ -1,6 +1,6 @@
 # GitHub 上传说明
 
-这个目录是已经清理的完整源码包，可以直接创建 Git 仓库并上传。建议仓库名：`wow-super-desktop`。
+这个目录是完整源码包，可以上传到 Song 自己的 GitHub。建议仓库名：`source-atlas-desktop`。
 
 ## 上传前包含的内容
 
@@ -16,17 +16,17 @@
 - `node_modules`、`dist`、`.vite`、`.next`、`.wrangler` 等依赖、构建结果和缓存。
 - `.env` 和 API Key。
 - SQLite 数据库、Electron `userData` 以及用户导入的私人文件。
-- 旧 Git 历史，因此可以作为一个全新仓库上传。
+- 本机应用数据与构建产物不会进入 Git；提交前仍应检查 `git status`。
 
 ## 方式一：使用 GitHub CLI
 
-在这个目录打开终端，执行：
+本项目保留原仓库历史。建议先保留原作者仓库为 `upstream`，再把自己的仓库设为 `origin`：
 
 ```bash
-git init -b main
 git add .
-git commit -m "Initial release: wow super desktop"
-gh repo create wow-super-desktop --private --source=. --remote=origin --push
+git commit -m "Initial SourceAtlas desktop release"
+git remote rename origin upstream
+gh repo create source-atlas-desktop --private --source=. --remote=origin --push
 ```
 
 如果希望公开仓库，把 `--private` 改为 `--public`。
@@ -37,10 +37,10 @@ gh repo create wow-super-desktop --private --source=. --remote=origin --push
 2. 在本目录执行：
 
 ```bash
-git init -b main
 git add .
-git commit -m "Initial release: wow super desktop"
-git remote add origin https://github.com/你的账号/wow-super-desktop.git
+git commit -m "Initial SourceAtlas desktop release"
+git remote rename origin upstream
+git remote add origin https://github.com/你的账号/source-atlas-desktop.git
 git push -u origin main
 ```
 
@@ -51,4 +51,3 @@ cd apps/desktop
 npm install
 npm run dev
 ```
-

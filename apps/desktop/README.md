@@ -1,4 +1,4 @@
-# 哇塞-超级桌面
+# 知源星图 · SourceAtlas
 
 本地优先的文件、知识库与 AI 无限画布桌面应用。
 
@@ -32,10 +32,18 @@ npm test
 npm run build
 ```
 
+打包当前 Mac 可直接运行的 `.app`：
+
+```bash
+npm run package:mac
+```
+
+打包产物默认写入 `release/知源星图-darwin-<架构>/知源星图.app`。
+
 首次在新设备安装依赖时，Electron 运行文件会从网络下载。若默认下载源不可用，可使用：
 
 ```bash
 ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ node node_modules/electron/install.js
 ```
 
-应用数据默认保存在 Electron 的 `userData` 目录，包括 SQLite 工作区与经系统安全存储加密的 AI 设置。
+应用数据默认保存在 Electron 的 `userData/SourceAtlas` 目录，包括 SQLite 工作区与经系统安全存储加密的 AI 设置。首次启动会兼容迁移旧版 `wow-super-desktop` 数据，旧数据不会被删除。

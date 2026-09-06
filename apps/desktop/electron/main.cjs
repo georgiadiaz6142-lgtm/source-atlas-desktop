@@ -7,6 +7,15 @@ const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
 const { KnowledgeService } = require('./knowledge-service.cjs');
 const { AIService } = require('./ai-service.cjs');
+const { createDocxBuffer, safeExportName } = require('./document-export.cjs');
+
+const APP_DISPLAY_NAME = '知源星图';
+const APP_INTERNAL_NAME = 'SourceAtlas';
+const DATABASE_NAME = 'source-atlas.sqlite';
+const LEGACY_USER_DATA_NAMES = ['wow-super-desktop', '哇塞-超级桌面'];
+
+app.setName(APP_INTERNAL_NAME);
+app.setPath('userData', path.join(app.getPath('appData'), APP_INTERNAL_NAME));
 
 let mainWindow;
 let knowledge;
@@ -14,12 +23,40 @@ let ai;
 const previewCache = new Map();
 const execFileAsync = promisify(execFile);
 
-protocol.registerSchemesAsPrivileged([{ scheme: 'wow-media', privileges: { standard: true, secure: true, stream: true, supportFetchAPI: true } }]);
+protocol.registerSchemesAsPrivileged([{ scheme: 'sourceatlas-media', privileges: { standard: true, secure: true, stream: true, supportFetchAPI: true } }]);
+
+async function copyIfMissing(source, destination) {
+  if (!fs.existsSync(source) || fs.existsSync(destination)) return false;
+  await fsp.mkdir(path.dirname(destination), { recursive: true });
+  await fsp.copyFile(source, destination);
+  return true;
+}
+
+async function migrateLegacyUserData(destination) {
+  await fsp.mkdir(destination, { recursive: true });
+  const appData = app.getPath('appData');
+  for (const legacyName of LEGACY_USER_DATA_NAMES) {
+    const legacy = path.join(appData, legacyName);
+    if (!fs.existsSync(legacy) || legacy === destination) continue;
+    for (const suffix of ['', '-wal', '-shm']) {
+      await copyIfMissing(
+        path.join(legacy, `wow-super-desktop.sqlite${suffix}`),
+        path.join(destination, `${DATABASE_NAME}${suffix}`),
+      );
+    }
+    await copyIfMissing(path.join(legacy, 'ai-settings.json'), path.join(destination, 'ai-settings.json'));
+    const generatedSource = path.join(legacy, 'generated');
+    const generatedDestination = path.join(destination, 'generated');
+    if (fs.existsSync(generatedSource) && !fs.existsSync(generatedDestination)) {
+      await fsp.cp(generatedSource, generatedDestination, { recursive: true });
+    }
+  }
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1440, height: 900, minWidth: 960, minHeight: 640,
-    title: '哇塞-超级桌面', backgroundColor: '#090b0f',
+    title: APP_DISPLAY_NAME, backgroundColor: '#090b0f',
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true,
@@ -56,6 +93,23 @@ function registerHandlers() {
   });
   ipcMain.handle('load-workspace', () => knowledge.loadWorkspace());
   ipcMain.handle('save-workspace', (_event, workspace) => knowledge.saveWorkspace(workspace));
+  ipcMain.handle('export-canvas-document', async (_event, input) => {
+    if (!input || !['txt', 'word'].includes(input.type)) throw new Error('不支持的导出格式');
+    const title = String(input.title || '未命名文档');
+    const content = String(input.content || '');
+    if (content.length > 20 * 1024 * 1024) throw new Error('文档内容超过 20 MB，暂时无法导出');
+    const isWord = input.type === 'word';
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: '保存画布文档到电脑',
+      defaultPath: path.join(app.getPath('documents'), safeExportName(title, input.type)),
+      filters: [{ name: isWord ? 'Word 文档' : '纯文本文档', extensions: [isWord ? 'docx' : 'txt'] }],
+      properties: ['createDirectory', 'showOverwriteConfirmation'],
+    });
+    if (result.canceled || !result.filePath) return { canceled: true };
+    const output = isWord ? await createDocxBuffer(title, content) : content;
+    await fsp.writeFile(result.filePath, output, isWord ? undefined : 'utf8');
+    return { canceled: false, path: result.filePath };
+  });
   ipcMain.handle('open-asset', (_event, filePath) => shell.openPath(filePath));
   ipcMain.handle('reveal-asset', (_event, filePath) => shell.showItemInFolder(filePath));
   ipcMain.handle('rename-asset', (_event, assetId, name) => knowledge.renameAsset(assetId, name));
@@ -89,7 +143,7 @@ function registerHandlers() {
     } else if (process.platform === 'darwin' && ['.docx', '.doc', '.pdf', '.pages', '.rtf', '.mp4', '.mov', '.m4v', '.avi', '.mkv', '.webm', '.mpeg', '.mpg'].includes(extension)) {
       let previewDirectory;
       try {
-        previewDirectory = await fsp.mkdtemp(path.join(app.getPath('temp'), 'wow-quicklook-'));
+        previewDirectory = await fsp.mkdtemp(path.join(app.getPath('temp'), 'sourceatlas-quicklook-'));
         await execFileAsync('/usr/bin/qlmanage', ['-t', '-s', '640', '-o', previewDirectory, filePath], { timeout: 30000 });
         const thumbnailName = (await fsp.readdir(previewDirectory)).find((name) => name.toLowerCase().endsWith('.png'));
         if (thumbnailName) dataUrl = `data:image/png;base64,${(await fsp.readFile(path.join(previewDirectory, thumbnailName))).toString('base64')}`;
@@ -110,11 +164,13 @@ function registerHandlers() {
   });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   const userData = app.getPath('userData');
-  knowledge = new KnowledgeService(path.join(userData, 'wow-super-desktop.sqlite'), emitProgress);
+  await migrateLegacyUserData(userData);
+  app.setAboutPanelOptions({ applicationName: APP_DISPLAY_NAME, applicationVersion: app.getVersion() });
+  knowledge = new KnowledgeService(path.join(userData, DATABASE_NAME), emitProgress);
   ai = new AIService(path.join(userData, 'ai-settings.json'), safeStorage);
-  protocol.handle('wow-media', (request) => {
+  protocol.handle('sourceatlas-media', (request) => {
     const id = decodeURIComponent(new URL(request.url).pathname.replace(/^\//, ''));
     const asset = knowledge.getAsset(id);
     if (!asset || asset.kind !== 'file') return new Response('Not found', { status: 404 });

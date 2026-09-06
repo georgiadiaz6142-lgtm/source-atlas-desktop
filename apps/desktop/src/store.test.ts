@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { collectEdgeNetwork, collectScope, useCanvasStore } from './store';
-import type { CanvasEdge, CanvasNode } from './types';
+import type { Asset, CanvasEdge, CanvasNode } from './types';
 
 describe('collectScope', () => {
   it('collects upstream assets and stops at AI nodes', () => {
@@ -35,6 +35,16 @@ describe('collectScope', () => {
 });
 
 describe('canvas connections', () => {
+  it('labels imported assets as references to local originals', () => {
+    const asset = { id: 'asset-1', path: '/tmp/资料.pdf', name: '资料.pdf', kind: 'file', extension: '.pdf', size: 1024, modifiedAt: 1, indexStatus: 'ready' } as Asset;
+    useCanvasStore.getState().hydrate({ nodes: [], edges: [], assets: [], revision: 1 }, []);
+    useCanvasStore.getState().addAssetNodes([asset]);
+    expect(useCanvasStore.getState().nodes[0].data).toMatchObject({
+      assetId: 'asset-1',
+      subtitle: '本地原文件',
+    });
+  });
+
   it('always hydrates into pan mode until the user explicitly selects marquee mode', () => {
     useCanvasStore.getState().setInteractionMode('select');
     useCanvasStore.getState().hydrate({ nodes: [], edges: [], assets: [], revision: 1 }, []);
